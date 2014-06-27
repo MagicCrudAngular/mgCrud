@@ -7,14 +7,14 @@ We like [ngResource](https://docs.angularjs.org/api/ngResource/service/$resource
 
 **mg-ajax** is the only directive and it has only 4 optional attributes.
 
-### Attribute mg-path
+### Attribute path
 
 This attribute allows to bind part of the path to our model data or params.
 /invoices/{{model.id}}
 /invoices/{{params.id}}
 The default value of this attribute is the [location.path()](https://docs.angularjs.org/api/ng/service/$location#path) like the action Html Forms.
 
-### Attribute mg-options
+### Attribute options
 
 This module defines how and what is sent to the server layer and how the response data is synchronized with existing ones.
 The most important thing is to define which http verb to use like GET, POST, PUT, PATCH or DELETE. So we've written a wrapper over [$http](https://docs.angularjs.org/api/ng/service/$http) that inserts calls to JavaScript functions within the life cycle of a request to server. These functions can be inserted **before** or after the [$http](https://docs.angularjs.org/api/ng/service/$http) promise **success** or **error**. You can also declare other commands that can be binded to angular directives like [ngClick](https://docs.angularjs.org/api/ngTouch/directive/ngClick).
