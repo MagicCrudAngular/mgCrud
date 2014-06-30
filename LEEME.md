@@ -39,4 +39,18 @@ Para modificar el comportamiento de un verbo en tu módulo o crear uno nuevo pued
 })(window.angular);
 ```
 
+Una vez creado myIndex tu puedes declarar en el html el comportamiento de index de la siguiente forma.
 
+```
+<mg-ajax mg-path=’/invoices’ mg-options=’myIndex’>
+…
+</mg-ajax> 
+```
+
+o
+
+```
+<mg-ajax mg-path=’/invoices’ mg-options=’{.......}’’>
+…
+</mg-ajax> 
+```
