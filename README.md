@@ -19,3 +19,37 @@ The default value of this attribute is the [location.path()](https://docs.angula
 This module defines how and what is sent to the server layer and how the response data is synchronized with existing ones.
 The most important thing is to define which http verb to use like GET, POST, PUT, PATCH or DELETE. So we've written a wrapper over [$http](https://docs.angularjs.org/api/ng/service/$http) that inserts calls to JavaScript functions within the life cycle of a request to server. These functions can be inserted **before** or after the [$http](https://docs.angularjs.org/api/ng/service/$http) promise **success** or **error**. You can also declare other commands that can be binded to angular directives like [ngClick](https://docs.angularjs.org/api/ngTouch/directive/ngClick).
 To configure requests you have the following predefined options: **mgQuery**, **mgPost**, **mgPut**, **mgPach** and **mgDelete**. If some of the predefined in the module options don’t fit your needs you can create your own modules or declare a json with a specific schema in the **options** attribute.
+To modify the verb behaviour in your module or to create a new one, you can code as:
+
+```
+(function (angular, undefined) {
+    var module;
+    if (!angular) return;
+
+    module = angular.module('myModule', ['mgCrud']);
+
+    myIndex.$inject = ['mgIndex'];
+    function myIndex(mgIndex) {
+        return angular.extend(mgIndex, {init:"{index.model.description='hello'}"});
+    }
+
+    module.factory('myIndex', myIndex);
+
+})(window.angular);
+```
+
+Once myIndex is created yoy can declare the index behaviour in html as:
+
+```
+<mg-ajax mg-path=’/invoices’ mg-options=’myIndex’>
+…
+</mg-ajax> 
+```
+
+or without declare a new factory:
+
+```
+<mg-ajax mg-path=’/invoices’ mg-options=’{.......}’’>
+…
+</mg-ajax> 
+```

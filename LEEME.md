@@ -19,7 +19,6 @@ El valor por defecto de este atributo es [location.path()](https://docs.angularj
 Este módulo define cómo y qué se envía a la capa servidora y cómo se sincronizan los datos de respuesta con los ya existentes.
 Lo más importante es definir qué verbo http se va a utilizar entre: GET, POST, PUT, PATCH  o DELETE. Para ello se ha escrito un wrapper sobre [$http](https://docs.angularjs.org/api/ng/service/$http) que inserta llamadas a functions JavaScript en el ciclo de vida de la llamada a la servidora. Estas funciones se pueden insertar **before** o después de que la promise [$http](https://docs.angularjs.org/api/ng/service/$http) retorne **success** o **error**. Además te permite declarar distintos command que podrás bindear a directivas de angular como [ngClick](https://docs.angularjs.org/api/ngTouch/directive/ngClick).
 Para la configuración de peticiones se han predefinido las siguientes opciones: **mgQuery**, **mgPost**, **mgPut**, **mgPach** y **mgDelete**. Si algunos de las opciones predefinidas en el módulo no se ajustan a tus necesidades puedes crear tus propios módulos o bien declarar un json con un esquema específico en el atributo **options**.
-
 Para modificar el comportamiento de un verbo en tu módulo o crear uno nuevo puedes implementarlo de la siguiente forma:
 
 ```
@@ -39,7 +38,7 @@ Para modificar el comportamiento de un verbo en tu módulo o crear uno nuevo pued
 })(window.angular);
 ```
 
-Una vez creado myIndex tu puedes declarar en el html el comportamiento de index de la siguiente forma.
+Una vez creado myIndex tu puedes declarar en el html el comportamiento de index de la siguiente forma:
 
 ```
 <mg-ajax mg-path=’/invoices’ mg-options=’myIndex’>
@@ -47,7 +46,7 @@ Una vez creado myIndex tu puedes declarar en el html el comportamiento de index 
 </mg-ajax> 
 ```
 
-o
+o sin declarar una nueva factoria:
 
 ```
 <mg-ajax mg-path=’/invoices’ mg-options=’{.......}’’>
