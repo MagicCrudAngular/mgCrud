@@ -7,14 +7,14 @@ Nos gustan los módulos [ngResource](https://docs.angularjs.org/api/ngResource/se
 
 **mg-ajax** es la única directiva y tiene solo 4 atributos opcionales.
 
-### Attribute path
+### Atributo path
 
 Este atributo permite enlazar parte de la ruta al modelo de datos o parametros.
 /invoices/{{model.id}}
 /invoices/{{params.id}}
 El valor por defecto de este atributo es [location.path()](https://docs.angularjs.org/api/ng/service/$location#path) como el action de un Forms de Html.
 
-### Attribute options
+### Atributo options
 
 Este módulo define cómo y qué se envía a la capa servidora y cómo se sincronizan los datos de respuesta con los ya existentes.
 Lo más importante es definir qué verbo http se va a utilizar entre: GET, POST, PUT, PATCH  o DELETE. Para ello se ha escrito un wrapper sobre [$http](https://docs.angularjs.org/api/ng/service/$http) que inserta llamadas a functions JavaScript en el ciclo de vida de la llamada a la servidora. Estas funciones se pueden insertar **before** o después de que la promise [$http](https://docs.angularjs.org/api/ng/service/$http) retorne **success** o **error**. Además te permite declarar distintos command que podrás bindear a directivas de angular como [ngClick](https://docs.angularjs.org/api/ngTouch/directive/ngClick).
@@ -46,10 +46,24 @@ Una vez creado myIndex tu puedes declarar en el html el comportamiento de index 
 </mg-ajax> 
 ```
 
-o sin declarar una nueva factoria:
+o sin declarar una nueva factoría:
 
 ```
-<mg-ajax mg-path=’/invoices’ mg-options=’{.......}’’>
+<mg-ajax mg-path=’/invoices’ mg-options=’{.......}’>
 …
 </mg-ajax> 
 ```
+
+### Atributo override
+
+Este atributo se utiliza para reemplazar el comportamiento predifinido de options de forma declarativa. El tipo de dato permitido es un object js declarado como string.
+
+```
+<mg-ajax mg-path=’/invoices’ mg-options=’mgIndex’ mg-override=”{init:’index.filter={page:0,recordsPerPage:15}’}” >
+…
+</mg-ajax> 
+```
+
+En este ejemplo se utiliza el comportamiento predefinido de mgIndex pero se reemplaza en el init el valor de recordsPerPage por 15. En concreto este html realiza la petición:
+
+GET /invoices?page=0&recordsPerPage=15

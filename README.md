@@ -38,7 +38,7 @@ To modify the verb behaviour in your module or to create a new one, you can code
 })(window.angular);
 ```
 
-Once myIndex is created yoy can declare the index behaviour in html as:
+Once myIndex is created you can declare the index behaviour in html as:
 
 ```
 <mg-ajax mg-path=’/invoices’ mg-options=’myIndex’>
@@ -49,7 +49,23 @@ Once myIndex is created yoy can declare the index behaviour in html as:
 or without declare a new factory:
 
 ```
-<mg-ajax mg-path=’/invoices’ mg-options=’{.......}’’>
+<mg-ajax mg-path=’/invoices’ mg-options=’{.......}’>
 …
 </mg-ajax> 
+```
+
+### Attribute override
+
+This attribute is used fot replace the options predefined behaviour in a declarative way. The allowed data type is a js object declared as string.
+
+```
+<mg-ajax mg-path=’/invoices’ mg-options=’mgIndex’ mg-override=”{init:’index.filter={page:0,recordsPerPage:15}’}” >
+…
+</mg-ajax> 
+```
+
+This example use the mgIndex predefined behaviour but the recordsPerPage value is replaced with 15 in the init object. This html produce the following REST request:
+
+```
+GET /invoices?page=0&recordsPerPage=15
 ```
