@@ -69,3 +69,24 @@ This example use the mgIndex predefined behaviour but the recordsPerPage value i
 ```
 GET /invoices?page=0&recordsPerPage=15
 ```
+
+### Attribute partialmodel
+
+In some scenarios when you want to edit an entity you can show a related class description and only send the ids (a saved information projection in client side). With that option we save data to send in each roundtrip. This can be used in all verbs without rectrictions, but it only make sense in the POST, PUT and PATCH verbs.
+In this edit example only the name will be send to server, cause of the id is defined in the http uri.
+
+```
+<mg-ajax data-path="/invoices/get/1" data-options="mgEdit" data-scope="false">
+	<mg-ajax data-path="/invoices/put/{{edit.model.id}}" data-options="mgPut" data-scope="false" data-partialmodel='{name:edit.model.name}'>
+		<form name="updatefrm" ng-submit="put.accept()">
+			<input type="text" ng-model="edit.model.id" />
+			<input type="text" ng-model="edit.model.name" />
+			<br />
+			computed field: {{edit.model.computed}}
+			<br />
+			<button type="submit">Guardar</button>
+			<button type="button" ng-click="put.close()">Cancelar</button>
+		</form>
+	</mg-ajax>
+</mg-ajax>
+```

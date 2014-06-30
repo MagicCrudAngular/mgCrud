@@ -62,8 +62,31 @@ Este atributo se utiliza para reemplazar el comportamiento predifinido de option
 <mg-ajax mg-path=’/invoices’ mg-options=’mgIndex’ mg-override=”{init:’index.filter={page:0,recordsPerPage:15}’}” >
 …
 </mg-ajax> 
-```
+
 
 En este ejemplo se utiliza el comportamiento predefinido de mgIndex pero se reemplaza en el init el valor de recordsPerPage por 15. En concreto este html realiza la petición:
 
+```
 GET /invoices?page=0&recordsPerPage=15
+```
+
+### Atributo partialmodel
+
+En determinados escenarios al editar una entidad podemos mostrar una descripción de todas clases relacionadas y solo querer actualizar solo sus identificadores (una proyección de la información almacenada en el cliente). Con esto ahorramos un gran volumen de tráfico en cada roundtrip. Esto se puede utilizar en todos los verbos sin ninguna restricción, pero solo tiene sentido para los verbos http POST, PUT y PATCH.
+En este ejemplo de edit solamente se enviará al servidor el name, puesto que el id ya va en el URI.
+
+```
+<mg-ajax data-path="/invoices/get/1" data-options="mgEdit" data-scope="false">
+	<mg-ajax data-path="/invoices/put/{{edit.model.id}}" data-options="mgPut" data-scope="false" data-partialmodel='{name:edit.model.name}'>
+		<form name="updatefrm" ng-submit="put.accept()">
+			<input type="text" ng-model="edit.model.id" />
+			<input type="text" ng-model="edit.model.name" />
+			<br />
+			computed field: {{edit.model.computed}}
+			<br />
+			<button type="submit">Guardar</button>
+			<button type="button" ng-click="put.close()">Cancelar</button>
+		</form>
+	</mg-ajax>
+</mg-ajax>
+```
