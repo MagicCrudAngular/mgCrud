@@ -22,7 +22,7 @@ Para la configuración de peticiones se han predefinido las siguientes opciones: 
 
 Para modificar el comportamiento de un verbo en tu módulo o crear uno nuevo puedes implementarlo de la siguiente forma:
 
-'''
+```
 (function (angular, undefined) {
     var module;
     if (!angular) return;
@@ -37,5 +37,6 @@ Para modificar el comportamiento de un verbo en tu módulo o crear uno nuevo pued
     module.factory('myIndex', myIndex);
 
 })(window.angular);
-'''
+```
+
 
