@@ -90,3 +90,40 @@ In this edit example only the name will be send to server, cause of the id is de
 	</mg-ajax>
 </mg-ajax>
 ```
+
+## JS object model for options and override attributes
+
+### as
+
+This field behaves like 'as' ngController and create an object with that name in its scope. Furthermore, a bind call is done in this process so the scope change in all functions and allow us to use 'this' in any factory function. It's required and unique inside the same scope.
+
+###  config
+
+Here we can define the http headers we need to send to server. Temporally they are stored in a module and will be send to server when build the request to server. With that option you can have different RESTFul providers.
+
+The object config has the following signature:
+
+```
+config{url,additionalConfig{...}}
+```
+
+With additionalConfig you can resolve the following $http values:
+
+headers,
+xsrfHeaderName
+xsrfCookieName 
+transformRequest 
+transformResponse 
+cache 
+timeout 
+withCredentials 
+responseType 
+
+Optionally you can configure a default value in the consumer module.
+
+```
+var module = angular.module('myModule', ['mgCrud']);
+module.config(function (mgHttpProvider) {
+        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196/' });
+});
+```

@@ -90,3 +90,40 @@ En este ejemplo de edit solamente se enviará al servidor el name, puesto que el 
 	</mg-ajax>
 </mg-ajax>
 ```
+
+## Modelo de objeto JavaScript para los atributos options y override
+
+### as
+
+El campo as tiene un comportamiento similar a ngController as y crea dentro de tu scope un object con ese nombre. Además se hace un bind contra este objeto con lo que cambia el ámbito de todas las functions y nos permite utilizar "this" en cualquier function de nuestras factorías. Es requerido y único dentro de un mismo scope.
+
+###  config
+
+Aquí se pueden definir las cabeceras http que se quieren enviar al servidor. De forma temporal estas son almacenadas en un módulo y luego son enviadas al servidor cuando se realice la llamada. Con esto se puede tener diferentes proveedores de servicios RESTFul.
+
+El objeto config tiene la siguiente signatura
+
+```
+config{url,additionalConfig{...}}
+```
+
+Con additionalConfig se pueden resolver los siguientes valores de $http
+
+headers,
+xsrfHeaderName
+xsrfCookieName 
+transformRequest 
+transformResponse 
+cache 
+timeout 
+withCredentials 
+responseType 
+
+Opcionalmente también se puede configurar un valor por defecto dentro de un módulo consumidor.
+
+```
+var module = angular.module('myModule', ['mgCrud']);
+module.config(function (mgHttpProvider) {
+        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196/' });
+});
+```
