@@ -19,3 +19,23 @@ El valor por defecto de este atributo es [location.path()](https://docs.angularj
 Este módulo define cómo y qué se envía a la capa servidora y cómo se sincronizan los datos de respuesta con los ya existentes.
 Lo más importante es definir qué verbo http se va a utilizar entre: GET, POST, PUT, PATCH  o DELETE. Para ello se ha escrito un wrapper sobre [$http](https://docs.angularjs.org/api/ng/service/$http) que inserta llamadas a functions JavaScript en el ciclo de vida de la llamada a la servidora. Estas funciones se pueden insertar **before** o después de que la promise [$http](https://docs.angularjs.org/api/ng/service/$http) retorne **success** o **error**. Además te permite declarar distintos command que podrás bindear a directivas de angular como [ngClick](https://docs.angularjs.org/api/ngTouch/directive/ngClick).
 Para la configuración de peticiones se han predefinido las siguientes opciones: **mgQuery**, **mgPost**, **mgPut**, **mgPach** y **mgDelete**. Si algunos de las opciones predefinidas en el módulo no se ajustan a tus necesidades puedes crear tus propios módulos o bien declarar un json con un esquema específico en el atributo **options**.
+
+Para modificar el comportamiento de un verbo en tu módulo o crear uno nuevo puedes implementarlo de la siguiente forma:
+
+'''
+(function (angular, undefined) {
+    var module;
+    if (!angular) return;
+
+    module = angular.module('myModule', ['mgCrud']);
+
+    myIndex.$inject = ['mgIndex'];
+    function myIndex(mgIndex) {
+        return angular.extend(mgIndex, {init:"{index.model.description='hello'}"});
+    }
+
+    module.factory('myIndex', myIndex);
+
+})(window.angular);
+'''
+
