@@ -62,7 +62,7 @@ Este atributo se utiliza para reemplazar el comportamiento predifinido de option
 <mg-ajax mg-path=’/invoices’ mg-options=’mgIndex’ mg-override=”{init:’index.filter={page:0,recordsPerPage:15}’}” >
 …
 </mg-ajax> 
-
+```
 
 En este ejemplo se utiliza el comportamiento predefinido de mgIndex pero se reemplaza en el init el valor de recordsPerPage por 15. En concreto este html realiza la petición:
 
