@@ -188,12 +188,12 @@ Method factory where we define the public methods of our scope ('as'). for examp
 ### auto
 
 Function we want eo execute when the directive has been read, this is valid for the initial load in an index page. Usually we write "accept" by default. 
-This function is solved after the path attribute is resolved via $attrs.$observe, because the path attribute is bindeable and the ajax calls are execute in an asynchronous way. If our path is for example 'invoices/{{param.id}}' we can't execute the ajax call of this directive before higher level directives are solved in case of mgAjax embedded directives.
+This function is solved after the path attribute is resolved via $attrs.observe, because the path attribute is bindeable and the ajax calls are execute in an asynchronous way. If our path is for example 'invoices/{{param.id}}' we can't execute the ajax call of this directive before higher level directives are solved in case of mgAjax embedded directives.
 
 ```
 function checkPath(fn) {
 	if (factory.regexPath) {
-		$attrs.$observe('path', function (value) {
+		attrs.$observe('path', function (value) {
 			var result = factory.regexPath.regexp.exec(value);
 			if (result) {
 				factory.path = value;
@@ -410,3 +410,60 @@ Example of html
 </mg-ajax>
 
 You can view a simple index without services neither controller. This allow you a declarative language thanks to magic angular.
+
+## src directory structure
+
+* Directives
+** mgAjaxDirective: Responsible for the magical module
+* Factories
+** mgCacheFactory: Contains the responsible method of angularjs cache management
+** mgSessionStorageFactory: Responsible for sessionStorage cache management
+** mgLocalStorageFactory: Responsible for localStorage cache management
+** mgCreateFactory: Predefined behaviour for options=mgCreate
+** mgDeleteFactory: Predefined behaviour for options=mgDelete
+** mgGlobalFactory: Global functions for reusing code
+** mgIndexFactory: Predefined behaviour for options=mgIndex
+** mgPutFactory: Predefined behaviour for options=mgPut
+** mgPatchFactory: Predefined behaviour for options=mgPatch
+** mgResolveFactory: Solve controller and directive dependencies
+* Providers
+** mgHttpProvider: Wrapper over $http in case of patch and query methods
+* Services
+** mgResolvePathService: Solve binding paths
+* Global
+** module: global file that define a function to check if an object is null
+
+## Dependences
+
+mgCrud has dependencies with:
+* Angularjs
+* ngRoute
+
+## How to use it
+
+```
+<script scr=’angular.js’>
+<script src=’angular-route.js’’>
+<script src=’mgcrud.js’>
+```
+
+## Advantages of using mgCrud.
+
+* Avoid repetitive code.
+* Avoid big JavaScript files in large apps.
+* Focus our attention in the view and forget of write not important and repetitive code.
+* Has in our scope an subscope that bind to this.
+* Wrap our scope this that is equal to 'as'.
+* Global scope for binding in case of nested scopes.
+* Eval expressions for this scope ('as') with global scope (mgEval).
+* Call to different Rest services providers.
+* Can call to different RESTFul providers from the module.
+
+
+## Roadmap
+
+* Support Foreign keys and maintain state in the view when round trip go back from create a related object.
+* Directive to cache data in the current view when navigate to other views.
+* Directive to clear cache.
+* MVC Razor helpers
+* Jade Helpers

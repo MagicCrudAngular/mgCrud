@@ -187,12 +187,12 @@ Factoría de métodos que se van a exponer como públicos en nuestro ámbito (as). P
 ### auto
 
 Función que queremos que se ejecute una vez se lea la directiva, esto es válido para la carga inicial de datos en un index. En este caso en auto pondremos “accept”.
-Esta función se resuelve después de resolver el atributo path mediante $attrs.$observe, puesto que el atributo path es bindeable y las llamadas ajax se ejecutan de forma asíncrona. Con lo cual si nuestro path por ejemplo contiene ‘invoices/{{param.id}}' no podemos ejecutar la llamada ajax para esta directiva hasta que no se haya resuelto una directiva de nivel superior en caso de anidación de directivas mgAjax
+Esta función se resuelve después de resolver el atributo path mediante $attrs.observe, puesto que el atributo path es bindeable y las llamadas ajax se ejecutan de forma asíncrona. Con lo cual si nuestro path por ejemplo contiene ‘invoices/{{param.id}}' no podemos ejecutar la llamada ajax para esta directiva hasta que no se haya resuelto una directiva de nivel superior en caso de anidación de directivas mgAjax
 
 ```
 function checkPath(fn) {
 	if (factory.regexPath) {
-		$attrs.$observe('path', function (value) {
+		attrs.$observe('path', function (value) {
 			var result = factory.regexPath.regexp.exec(value);
 			if (result) {
 				factory.path = value;
@@ -408,3 +408,60 @@ Un ejemplo de esta representación en html sería el siguiente.
 </mg-ajax>
 
 Como se puede observar se ha resuelto un sencillo index sin servicios ni controller. Lo que nos permite un lenguaje totalmente declarativo gracias a la magia de mgAjax.
+
+## Estructura del directorio src
+
+* Directives
+** mgAjaxDirective: Responsable de toda la mágia del módulo
+* Factories
+** mgCacheFactory: Agrega el método responsable de gestionar la cache de Angularjs
+** mgSessionStorageFactory: Responsable de gestionar la cache con SessionStorage
+** mgLocalStorageFactory: Responsable de gestionar la cache con LocalStorage
+** mgCreateFactory: Comportamiento predefinido de para options=mgCreate
+** mgDeleteFactory: Comportamiento predefinido de para options=mgDelete
+** mgGlobalFactory: Funciones globales que nos permiten reutilización de código
+** mgIndexFactory: Comportamiento predefinido de para options=mgIndex
+** mgPutFactory: Comportamiento predefinido de para options=mgPut
+** mgPatchFactory: Comportamiento predefinido de para options=mgPatch
+** mgResolveFactory: Resuelve las dependencias del controllador de la directiva
+* Providers
+** mgHttpProvider: Wrapper sobre $http para permitir patch y query
+* Services
+** mgResolvePathService: Resolución de los path bindeados
+* Global
+** module: archivo global que define una function para comprobar si un obj es vacío
+
+## Dependencias
+
+El modulo mgCrud tiene dependencia de:
+* Angularjs
+* ngRoute
+
+## Forma de utilizarlo
+
+```
+<script scr=’angular.js’>
+<script src=’angular-route.js’’>
+<script src=’mgcrud.js’>
+```
+
+## Ventajas de utilizar mgCrud.
+
+* Evitar código repetitivo.
+* Evitar un JavaScript muy grande en el caso de una gran app.
+* Centrarnos en la vista y olvidarnos de escribir un código que poco nos aporta.
+* Tener dentro de nuestro scope un subámbito que siempre se resuelve con this.
+* Encapsulación de nuestro ámbito this que es igual a 'as'.
+* Ámbito global para los binding en el caso de anidación de scopes.
+* Evaluación de expresiones para el ámbito this (as) con alcance global (mgEval).
+* Llamada a diferentes proveedores de servicios Rest.
+* Posibilidad de hacer llamadas a diferentes proveedores RESTFul desde el mismo módulo.
+
+
+## Hoja de ruta
+
+* Soporte para foreingKey y mantener el estado de la vista una vez que volvamos de crear una foreingKey.
+* Directiva para cachear los datos de la vista actual al navegar a otras vistas.
+* Directiva para hacer clear de la cache.
+* Helpers para Razor de MVC
+* Helpers para Jade
