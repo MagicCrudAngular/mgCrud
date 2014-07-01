@@ -406,6 +406,7 @@ Un ejemplo de esta representación en html sería el siguiente.
 		</ul>
 	</div>
 </mg-ajax>
+```
 
 Como se puede observar se ha resuelto un sencillo index sin servicios ni controller. Lo que nos permite un lenguaje totalmente declarativo gracias a la magia de mgAjax.
 
