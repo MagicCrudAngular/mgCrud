@@ -109,22 +109,22 @@ config{url,additionalConfig{...}}
 
 Con additionalConfig se pueden resolver los siguientes valores de $http
 
-headers,
-xsrfHeaderName
-xsrfCookieName 
-transformRequest 
-transformResponse 
-cache 
-timeout 
-withCredentials 
-responseType 
+* headers
+* xsrfHeaderName
+* xsrfCookieName 
+* transformRequest 
+* transformResponse 
+* cache 
+* timeout 
+* withCredentials 
+* responseType 
 
 Opcionalmente también se puede configurar un valor por defecto dentro de un módulo consumidor.
 
 ```
 var module = angular.module('myModule', ['mgCrud']);
 module.config(function (mgHttpProvider) {
-        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196/' });
+        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196' });
 });
 ```
 
