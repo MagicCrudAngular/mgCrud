@@ -127,3 +127,29 @@ module.config(function (mgHttpProvider) {
         mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196/' });
 });
 ```
+
+### init
+
+Tiene un comportamiento idéntico a ngInit. Nos permite actualizar nuestro ámbito (a unos valores predeterminados) dentro del objeto as.
+
+### method
+
+Los métodos soportados son query, get, post, put, patch y delete. Este campo es requerido.
+
+### service
+
+Es una factoría wrapper sobre $http a la que se le dota de métodos cortos para query (que se resuelve con el verbo http GET) y patch. El valor es requerido y por defecto se utiliza ‘mgHttpFactory’ aunque se puede crear un servicio propio y reemplazar este con override o crear tu propia factoría. Se resuelve con el método get de $injector. 
+
+### before
+
+Conjunto de funciones que se van a ejecutar antes de la llamada al servicio rest. Este campo es optional. Es una factoria donde se van a ejecutar todas las funciones de esta y en el orden en el que están declaradas. 
+Por ejemplo antes de cada llamada http nos puede interesar establecer dentro de mi objeto ámbito (as) una propiedad show con valor a true. Esto por ejemplo  va a permitir mostrar un spinner que se ocultará con otra function desde success y error.
+
+```
+beforeHttpFactory.$inject = ['phSpinnerFactory'];
+function beforeHttpFactory(spinner) {
+        return {
+            show: spinner.show
+        };
+}
+```
