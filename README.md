@@ -408,30 +408,31 @@ Example of html
 		</ul>
 	</div>
 </mg-ajax>
+```
 
 You can view a simple index without services neither controller. This allow you a declarative language thanks to magic angular.
 
 ## src directory structure
 
 * Directives
-** mgAjaxDirective: Responsible for the magical module
+  * mgAjaxDirective: Responsible for the magical module
 * Factories
-** mgCacheFactory: Contains the responsible method of angularjs cache management
-** mgSessionStorageFactory: Responsible for sessionStorage cache management
-** mgLocalStorageFactory: Responsible for localStorage cache management
-** mgCreateFactory: Predefined behaviour for options=mgCreate
-** mgDeleteFactory: Predefined behaviour for options=mgDelete
-** mgGlobalFactory: Global functions for reusing code
-** mgIndexFactory: Predefined behaviour for options=mgIndex
-** mgPutFactory: Predefined behaviour for options=mgPut
-** mgPatchFactory: Predefined behaviour for options=mgPatch
-** mgResolveFactory: Solve controller and directive dependencies
+  * mgCacheFactory: Contains the responsible method of angularjs cache management
+  * mgSessionStorageFactory: Responsible for sessionStorage cache management
+  * mgLocalStorageFactory: Responsible for localStorage cache management
+  * mgCreateFactory: Predefined behaviour for options=mgCreate
+  * mgDeleteFactory: Predefined behaviour for options=mgDelete
+  * mgGlobalFactory: Global functions for reusing code
+  * mgIndexFactory: Predefined behaviour for options=mgIndex
+  * mgPutFactory: Predefined behaviour for options=mgPut
+  * mgPatchFactory: Predefined behaviour for options=mgPatch
+  * mgResolveFactory: Solve controller and directive dependencies
 * Providers
-** mgHttpProvider: Wrapper over $http in case of patch and query methods
+  * mgHttpProvider: Wrapper over $http in case of patch and query methods
 * Services
-** mgResolvePathService: Solve binding paths
+  * mgResolvePathService: Solve binding paths
 * Global
-** module: global file that define a function to check if an object is null
+  * module: global file that define a function to check if an object is null
 
 ## Dependences
 
