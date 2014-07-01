@@ -413,24 +413,24 @@ Como se puede observar se ha resuelto un sencillo index sin servicios ni control
 ## Estructura del directorio src
 
 * Directives
-** mgAjaxDirective: Responsable de toda la mágia del módulo
+  * mgAjaxDirective: Responsable de toda la mágia del módulo
 * Factories
-** mgCacheFactory: Agrega el método responsable de gestionar la cache de Angularjs
-** mgSessionStorageFactory: Responsable de gestionar la cache con SessionStorage
-** mgLocalStorageFactory: Responsable de gestionar la cache con LocalStorage
-** mgCreateFactory: Comportamiento predefinido de para options=mgCreate
-** mgDeleteFactory: Comportamiento predefinido de para options=mgDelete
-** mgGlobalFactory: Funciones globales que nos permiten reutilización de código
-** mgIndexFactory: Comportamiento predefinido de para options=mgIndex
-** mgPutFactory: Comportamiento predefinido de para options=mgPut
-** mgPatchFactory: Comportamiento predefinido de para options=mgPatch
-** mgResolveFactory: Resuelve las dependencias del controllador de la directiva
+  * mgCacheFactory: Agrega el método responsable de gestionar la cache de Angularjs
+  * mgSessionStorageFactory: Responsable de gestionar la cache con SessionStorage
+  * mgLocalStorageFactory: Responsable de gestionar la cache con LocalStorage
+  * mgCreateFactory: Comportamiento predefinido de para options=mgCreate
+  * mgDeleteFactory: Comportamiento predefinido de para options=mgDelete
+  * mgGlobalFactory: Funciones globales que nos permiten reutilización de código
+  * mgIndexFactory: Comportamiento predefinido de para options=mgIndex
+  * mgPutFactory: Comportamiento predefinido de para options=mgPut
+  * mgPatchFactory: Comportamiento predefinido de para options=mgPatch
+  * mgResolveFactory: Resuelve las dependencias del controllador de la directiva
 * Providers
-** mgHttpProvider: Wrapper sobre $http para permitir patch y query
+  * mgHttpProvider: Wrapper sobre $http para permitir patch y query
 * Services
-** mgResolvePathService: Resolución de los path bindeados
+  * mgResolvePathService: Resolución de los path bindeados
 * Global
-** module: archivo global que define una function para comprobar si un obj es vacío
+  * module: archivo global que define una function para comprobar si un obj es vacío
 
 ## Dependencias
 
