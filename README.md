@@ -10,8 +10,9 @@ We like [ngResource](https://docs.angularjs.org/api/ngResource/service/$resource
 ### Attribute path
 
 This attribute allows to bind part of the path to our model data or params.
-/invoices/{{model.id}}
-/invoices/{{params.id}}
+* /invoices/{{model.id}}
+* /invoices/{{params.id}}
+
 The default value of this attribute is the [location.path()](https://docs.angularjs.org/api/ng/service/$location#path) like the action Html Forms.
 
 ### Attribute options
