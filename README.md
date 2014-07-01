@@ -10,8 +10,9 @@ We like [ngResource](https://docs.angularjs.org/api/ngResource/service/$resource
 ### Attribute path
 
 This attribute allows to bind part of the path to our model data or params.
-/invoices/{{model.id}}
-/invoices/{{params.id}}
+* /invoices/{{model.id}}
+* /invoices/{{params.id}}
+
 The default value of this attribute is the [location.path()](https://docs.angularjs.org/api/ng/service/$location#path) like the action Html Forms.
 
 ### Attribute options
@@ -109,47 +110,21 @@ config{url,additionalConfig{...}}
 
 With additionalConfig you can resolve the following $http values:
 
-headers,
-xsrfHeaderName
-xsrfCookieName 
-transformRequest 
-transformResponse 
-cache 
-timeout 
-withCredentials 
-responseType 
+* headers
+* xsrfHeaderName
+* xsrfCookieName 
+* transformRequest 
+* transformResponse 
+* cache 
+* timeout 
+* withCredentials 
+* responseType 
 
-Optionally you can configure a default value in consumer module.
+Optionally you can configure a default value in the consumer module.
 
 ```
 var module = angular.module('myModule', ['mgCrud']);
 module.config(function (mgHttpProvider) {
-        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196/' });
+        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196' });
 });
-```
-
-### init
-
-It has a similar behabiour to ngInit and allow us to update our scope (with predefined values) in the 'as' object.
-
-### method
-
-Supported methods are query, get, post, put, patch and delete. This field is required.
-
-### service
-
-It's a wrapper factory over $http where assign shorts methods to query (it's resolved with GET http verb) and patch. This value is required and you has to use 'mgHttpFactory' by default, although you can create your own service and replace it in override member or create your own factory. It's resolved using the $injector get method.
-
-### before
-
-Set of functions that are going to be executed before the REST invocation. This field is optional. Internally, it's a factory where all declared functionsare going to be executed in order.
-For example, before an http call may be you want to set a property to true in the 'as' scope to show a spinner, and hide it in the success and error method.
-
-```
-beforeHttpFactory.$inject = ['phSpinnerFactory'];
-function beforeHttpFactory(spinner) {
-        return {
-            show: spinner.show
-        };
-}
 ```
