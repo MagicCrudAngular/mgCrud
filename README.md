@@ -124,6 +124,6 @@ Optionally you can configure a default value in the consumer module.
 ```
 var module = angular.module('myModule', ['mgCrud']);
 module.config(function (mgHttpProvider) {
-        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196/' });
+        mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196' });
 });
 ```
