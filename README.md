@@ -408,6 +408,7 @@ Example of html
 		</ul>
 	</div>
 </mg-ajax>
+```
 
 You can view a simple index without services neither controller. This allow you a declarative language thanks to magic angular.
 
