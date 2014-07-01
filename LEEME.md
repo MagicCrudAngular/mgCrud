@@ -148,8 +148,187 @@ Por ejemplo antes de cada llamada http nos puede interesar establecer dentro de 
 ```
 beforeHttpFactory.$inject = ['phSpinnerFactory'];
 function beforeHttpFactory(spinner) {
-        return {
-            show: spinner.show
-        };
+	return {
+		show: spinner.show
+	};
 }
 ```
+
+### success
+
+Tiene el mismo comportamiento que before, con la única salvedad que se ejecuta en el success de la promise $http. Este campo es optional, pero lo más lógico es usarlo para actualizar información una vez invocado al servidor con éxito.
+
+###  error
+
+Tiene el mismo comportamiento que success y before pero se ejecuta en caso de error de la promise $http. También es optional.
+
+### cacheService
+
+Angular magic nos permite cachear información en la cache propia de angular ($cacheFactory) con el id de mgCache en localStorage y sesionStorage.
+
+
+### cacheFactory
+
+Array de datos que queremos guardar en cache y que se corresponden con nuestro módelo.
+
+### cacheKey
+
+Esta es la clave de la cache que equivale a location.path() + el valor de as. Si por cualquier circustancia esto causa algún tipo de colisión será el desarrollador el responsable de establecer una key específica.
+
+```
+iif (factory.cache) {
+	factory.cache = parse(factory.cache)();
+factory.cacheKey = factory.cacheKey || location.path() + (factory.as || '');
+```
+
+### cmd
+
+Factoría de métodos que se van a exponer como públicos en nuestro ámbito (as). Por ejemplo para mgIndex por defecto se exponen accept, previousPage y nextPage. Estos métodos son los que bindearemos a nuestra vista por ejemplo en la directiva ngClick.
+
+### auto
+
+Funcción que queremos que se ejecute una vez se lea la directiva, esto es válido para la carga inicial de datos en un index. En este caso en auto pondremos “accept”.
+Esta función se resuelve después de resolver el atributo path mediante $attr.observe, puesto que el atributo path es bindeable y las llamadas ajax se ejecutan de forma asíncrona. Con lo cual si nuestro path por ejemplo contiene ‘invoices/{{param.id}}' no podemos ejecutar la llamada ajax para esta directiva hasta que no se haya resuelto una directiva de nivel superior en caso de anidación de directivas mgAjax
+
+```
+function checkPath(fn) {
+       if (factory.regexPath) {
+             attrs.$observe('path', function (value) {
+                    var result = factory.regexPath.regexp.exec(value);
+                    if (result) {
+                        factory.path = value;
+                        fn();
+                    };
+                });
+        } else {
+             fn();
+        }
+}
+```
+
+### ajaxCmd
+
+Tiene le mismo comportamiento que auto pero para los verbos http POST, PUT, PATCH y DELETE.
+
+## Factorías predefinidas
+
+### Factoría mgIndex
+
+```
+module.factory('mgIndex', function () {
+	return {
+		as: 'index',
+		init: 'index.filter={page:0,records:20}',
+		method: 'query',
+		service: 'mgHttpFactory',
+		cacheService: 'mgCacheFactory',
+		cache: '["filter"]',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryIndex',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandIndex',
+		auto: 'accept'
+	};
+});
+```
+
+### Factoría mgEdit
+
+```
+ module.factory('mgEdit', function () {
+	return {
+		as: 'edit',
+		method: 'get',
+		service: 'mgHttpFactory',
+		cacheService: 'mgCacheFactory',
+		cache: '["model"]',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryIndex',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgAcceptFactory',
+		auto: 'accept'
+	};
+});
+```
+
+### Factoría mgPut
+
+```
+module.factory('mgPut', function () {
+	return {
+		as: 'put',
+		init: 'put.model=edit.model',
+		method: 'put',
+		service: 'mgHttpFactory',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryCreate',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+
+### Factoría mgPatch
+
+```
+module.factory('mgPatch', function () {
+	return {
+		as: 'patch',
+		init: patch.model=edit.model',
+		method: 'patch',
+		service: 'mgHttpFactory',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryCreate',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+
+### Factoría mgCreate
+
+```
+module.factory('mgCreate', function () {
+	return {
+		as: 'create',
+		method: 'post',
+		service: 'mgHttpFactory',
+		cacheService: 'mgCacheFactory',
+		cache: '["model"]',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryCreate',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+
+### Factoría mgDelete
+
+```
+module.factory('mgDelete', function () {
+	return {
+		as: 'delete',
+		method: 'delete',
+		service: 'mgHttpFactory',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSucessFactoryDelete',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+	
+Tanto service, before, success, error y cmd son factorías que agrupan una o más functions y se resuelven en tiempo de ejecución con el método get de $injector.
+Todos los cmd reciben como parámetro un objeto factory donde guardamos el path y la resolución de todas las subfactorias.
+Todos las funcciones agrupadas en success y error reciben como parámetro la respuesta http agrupada en el siguiente objeto.
+
+```
+{ data: data, status: status, headers: headers, config: config }
+```
+
+Las funcciones agrupadas en before no reciben ningún parámetro.
