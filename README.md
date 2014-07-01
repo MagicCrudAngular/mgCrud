@@ -109,15 +109,15 @@ config{url,additionalConfig{...}}
 
 With additionalConfig you can resolve the following $http values:
 
-headers,
-xsrfHeaderName
-xsrfCookieName 
-transformRequest 
-transformResponse 
-cache 
-timeout 
-withCredentials 
-responseType 
+* headers
+* xsrfHeaderName
+* xsrfCookieName 
+* transformRequest 
+* transformResponse 
+* cache 
+* timeout 
+* withCredentials 
+* responseType 
 
 Optionally you can configure a default value in the consumer module.
 
