@@ -154,3 +154,181 @@ function beforeHttpFactory(spinner) {
         };
 }
 ```
+
+### success
+
+It has the same behaviour as 'before', but it's executed in the success part of the $http promise. This field is optional, but it's more logical use it for update information after a server call success.
+
+###  error
+
+Has the same behabiour that success or before but it's executed in case of error of the $http promise. It's optional too.
+
+### cacheService
+
+Angular magic allow us to cache information in the angular cache ($cacheFactory) with the id defined in mgCache in localStorage y sesionStorage.
+
+### cacheFactory
+
+Model data that we want to save in the cache.
+
+### cacheKey
+
+This is the cache key and is equal to location.path() + the 'as' value. If some times this produce a colisión the developer had to set an specific key to solve it.
+
+```
+iif (factory.cache) {
+	factory.cache = parse(factory.cache)();
+factory.cacheKey = factory.cacheKey || location.path() + (factory.as || '');
+```
+
+### cmd
+
+Method factory where we define the public methods of our scope ('as'). for example, in mgIndex by default we define accept, previousPage and nextPage. These methods are what we bin in the View for example in the ngClick directive.
+
+### auto
+
+Function we want eo execute when the directive has been read, this is valid for the initial load in an index page. Usually we write "accept" by default. 
+This function is solved after the path attribute is resolved via $attr.observe, because the path attribute is bindeable and the ajax calls are execute in an asynchronous way. If our path is for example 'invoices/{{param.id}}' we can't execute the ajax call of this directive before higher level directives are solved in case of mgAjax embedded directives.
+
+```
+function checkPath(fn) {
+	if (factory.regexPath) {
+		attrs.$observe('path', function (value) {
+			var result = factory.regexPath.regexp.exec(value);
+			if (result) {
+				factory.path = value;
+				fn();
+			};
+		});
+	} else {
+		fn();
+	}
+}
+```
+
+### ajaxCmd
+
+It has the same behaviour as 'auto' but it's for http verbs POST, PUT, PATCH and DELETE.
+
+## Predefined factories
+
+### Factory mgIndex
+
+```
+module.factory('mgIndex', function () {
+	return {
+		as: 'index',
+		init: 'index.filter={page:0,records:20}',
+		method: 'query',
+		service: 'mgHttpFactory',
+		cacheService: 'mgCacheFactory',
+		cache: '["filter"]',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryIndex',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandIndex',
+		auto: 'accept'
+	};
+});
+```
+
+### Factory mgEdit
+
+```
+ module.factory('mgEdit', function () {
+	return {
+		as: 'edit',
+		method: 'get',
+		service: 'mgHttpFactory',
+		cacheService: 'mgCacheFactory',
+		cache: '["model"]',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryIndex',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgAcceptFactory',
+		auto: 'accept'
+	};
+});
+```
+
+### Factory mgPut
+
+```
+module.factory('mgPut', function () {
+	return {
+		as: 'put',
+		init: 'put.model=edit.model',
+		method: 'put',
+		service: 'mgHttpFactory',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryCreate',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+
+### Factory mgPatch
+
+```
+module.factory('mgPatch', function () {
+	return {
+		as: 'patch',
+		init: patch.model=edit.model',
+		method: 'patch',
+		service: 'mgHttpFactory',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryCreate',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+
+### Factory mgCreate
+
+```
+module.factory('mgCreate', function () {
+	return {
+		as: 'create',
+		method: 'post',
+		service: 'mgHttpFactory',
+		cacheService: 'mgCacheFactory',
+		cache: '["model"]',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSuccessFactoryCreate',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+
+### Factory mgDelete
+
+```
+module.factory('mgDelete', function () {
+	return {
+		as: 'delete',
+		method: 'delete',
+		service: 'mgHttpFactory',
+		before: 'mgBeforeHttpFactory',
+		success: 'mgSucessFactoryDelete',
+		error: 'mgErrorHttpFactory',
+		cmd: 'mgCommandCreate',
+		ajaxCmd: 'accept'
+	};
+});
+```
+
+Service, before, success, error and cmd are factories that join one or more functions and are solved in execution time with the $injector get method.
+All cmd have a factory object as inbound argument where path and subfactory resolutions are saved.
+All functions used in success and error have the http response as inbound argument with the following format.
+
+```
+{ data: data, status: status, headers: headers, config: config }
+```
+
+All functions used in 'before' has no inbound arguments.

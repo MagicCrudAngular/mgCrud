@@ -166,7 +166,6 @@ Tiene el mismo comportamiento que success y before pero se ejecuta en caso de er
 
 Angular magic nos permite cachear información en la cache propia de angular ($cacheFactory) con el id de mgCache en localStorage y sesionStorage.
 
-
 ### cacheFactory
 
 Array de datos que queremos guardar en cache y que se corresponden con nuestro módelo.
@@ -187,22 +186,22 @@ Factoría de métodos que se van a exponer como públicos en nuestro ámbito (as). P
 
 ### auto
 
-Funcción que queremos que se ejecute una vez se lea la directiva, esto es válido para la carga inicial de datos en un index. En este caso en auto pondremos “accept”.
+Función que queremos que se ejecute una vez se lea la directiva, esto es válido para la carga inicial de datos en un index. En este caso en auto pondremos “accept”.
 Esta función se resuelve después de resolver el atributo path mediante $attr.observe, puesto que el atributo path es bindeable y las llamadas ajax se ejecutan de forma asíncrona. Con lo cual si nuestro path por ejemplo contiene ‘invoices/{{param.id}}' no podemos ejecutar la llamada ajax para esta directiva hasta que no se haya resuelto una directiva de nivel superior en caso de anidación de directivas mgAjax
 
 ```
 function checkPath(fn) {
-       if (factory.regexPath) {
-             attrs.$observe('path', function (value) {
-                    var result = factory.regexPath.regexp.exec(value);
-                    if (result) {
-                        factory.path = value;
-                        fn();
-                    };
-                });
-        } else {
-             fn();
-        }
+	if (factory.regexPath) {
+		attrs.$observe('path', function (value) {
+			var result = factory.regexPath.regexp.exec(value);
+			if (result) {
+				factory.path = value;
+				fn();
+			};
+		});
+	} else {
+		fn();
+	}
 }
 ```
 
