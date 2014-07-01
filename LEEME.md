@@ -175,7 +175,7 @@ Array de datos que queremos guardar en cache y que se corresponden con nuestro m
 Esta es la clave de la cache que equivale a location.path() + el valor de as. Si por cualquier circustancia esto causa algún tipo de colisión será el desarrollador el responsable de establecer una key específica.
 
 ```
-iif (factory.cache) {
+if (factory.cache) {
 	factory.cache = parse(factory.cache)();
 factory.cacheKey = factory.cacheKey || location.path() + (factory.as || '');
 ```
@@ -187,12 +187,12 @@ Factoría de métodos que se van a exponer como públicos en nuestro ámbito (as). P
 ### auto
 
 Función que queremos que se ejecute una vez se lea la directiva, esto es válido para la carga inicial de datos en un index. En este caso en auto pondremos “accept”.
-Esta función se resuelve después de resolver el atributo path mediante $attr.observe, puesto que el atributo path es bindeable y las llamadas ajax se ejecutan de forma asíncrona. Con lo cual si nuestro path por ejemplo contiene ‘invoices/{{param.id}}' no podemos ejecutar la llamada ajax para esta directiva hasta que no se haya resuelto una directiva de nivel superior en caso de anidación de directivas mgAjax
+Esta función se resuelve después de resolver el atributo path mediante $attrs.$observe, puesto que el atributo path es bindeable y las llamadas ajax se ejecutan de forma asíncrona. Con lo cual si nuestro path por ejemplo contiene ‘invoices/{{param.id}}' no podemos ejecutar la llamada ajax para esta directiva hasta que no se haya resuelto una directiva de nivel superior en caso de anidación de directivas mgAjax
 
 ```
 function checkPath(fn) {
 	if (factory.regexPath) {
-		attrs.$observe('path', function (value) {
+		$attrs.$observe('path', function (value) {
 			var result = factory.regexPath.regexp.exec(value);
 			if (result) {
 				factory.path = value;
@@ -330,4 +330,81 @@ Todos las funcciones agrupadas en success y error reciben como parámetro la resp
 { data: data, status: status, headers: headers, config: config }
 ```
 
-Las funcciones agrupadas en before no reciben ningún parámetro.
+Las funciones agrupadas en before no reciben ningún parámetro.
+
+## Modelo de datos
+
+La directiva mgAjax, agrega internamente siempre filter y model, aunque filter solo se utiliza con options mgIndex.
+
+Antes de enviar datos a nuestro servidor a través de mgHttpFactory el modelo se resuelve con la siguiente factoría.
+
+```
+acceptFactory.$inject = [];
+function acceptFactory() {
+	function accept(factory) {
+		var model = (factory.partialModel && this.mgEval(factory.partialModel)) || this.filter || this.model || {};
+		factory.service(factory.path, model);
+	}
+	return {
+		accept: accept
+	};
+}
+module.factory('mgAcceptFactory', acceptFactory);
+```
+
+Una vez que los datos son recibidos desde el servidor estos siempre se alojan en el objeto model dentro del ámbito 'as' y se resuelven con la siguiente factoría.
+
+```
+createModelFactory.$inject = [];
+function createModelFactory() {
+	function assignModel(response) {
+		angular.extend(this.model, response.data || {});
+	}
+	return {
+		assignModel: assignModel
+	};
+ }
+module.factory('mgCreateModelFactory', createModelFactory);
+```
+
+Con lo cual nuestro ámbito 'as' dentro de un scope para index quedaría de la siguiente forma.
+
+```
+{
+	filter: {page:0,recorsPerPage:25} //filtro aplicado
+	model:[...]
+	status:200 // después de llamar al servicio http
+	errorText : // solo presente si se ha producido un error una vez llamado al servicio http
+	show:false // spinner oculto
+	accept:function() // llama al servicio http pasando como query filter
+	previousPage: function()  // resta 1 a page y llama a accept
+	mgEval:function() // bindeada a $scope y de esa forma en cualquier sitio poder resolver una expresion global.
+	nextPage: function() // suma 1 a page y llama a accept.   
+	params:{} // solo disponible en el caso de que la ruta se resuelva con parametros.
+}
+```
+
+Un ejemplo de esta representación en html sería el siguiente.
+
+```
+<mg-ajax data-path="/invoices" data-options="mgIndex">
+	<div class=’spinner’ ng-show=’index.show’/>
+	<div class=’error’’ ng-show=’index.errorText> 
+		{{index.errorText}}
+	</div>
+	<input type="text" ng-model="parent.filter.name" ng-change="parent.accept()" />
+	<div>
+		<button ng-click="index.accept()">Accept</button>
+		<button ng-click="index.nextPage()">Next</button>
+		<button ng-click="index.previousPage()" ng-disabled="index.filter.page==0">Previous</button>
+	</div>
+	<div>          
+		<ul>
+			<li ng-repeat="item in index.model">
+				{{item.id}}-{{item.name}}
+			</li>               
+		</ul>
+	</div>
+</mg-ajax>
+
+Como se puede observar se ha resuelto un sencillo index sin servicios ni controller. Lo que nos permite un lenguaje totalmente declarativo gracias a la magia de mgAjax.

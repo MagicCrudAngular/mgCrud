@@ -176,7 +176,7 @@ Model data that we want to save in the cache.
 This is the cache key and is equal to location.path() + the 'as' value. If some times this produce a colisión the developer had to set an specific key to solve it.
 
 ```
-iif (factory.cache) {
+if (factory.cache) {
 	factory.cache = parse(factory.cache)();
 factory.cacheKey = factory.cacheKey || location.path() + (factory.as || '');
 ```
@@ -188,12 +188,12 @@ Method factory where we define the public methods of our scope ('as'). for examp
 ### auto
 
 Function we want eo execute when the directive has been read, this is valid for the initial load in an index page. Usually we write "accept" by default. 
-This function is solved after the path attribute is resolved via $attr.observe, because the path attribute is bindeable and the ajax calls are execute in an asynchronous way. If our path is for example 'invoices/{{param.id}}' we can't execute the ajax call of this directive before higher level directives are solved in case of mgAjax embedded directives.
+This function is solved after the path attribute is resolved via $attrs.$observe, because the path attribute is bindeable and the ajax calls are execute in an asynchronous way. If our path is for example 'invoices/{{param.id}}' we can't execute the ajax call of this directive before higher level directives are solved in case of mgAjax embedded directives.
 
 ```
 function checkPath(fn) {
 	if (factory.regexPath) {
-		attrs.$observe('path', function (value) {
+		$attrs.$observe('path', function (value) {
 			var result = factory.regexPath.regexp.exec(value);
 			if (result) {
 				factory.path = value;
@@ -332,3 +332,81 @@ All functions used in success and error have the http response as inbound argume
 ```
 
 All functions used in 'before' has no inbound arguments.
+
+## Data model
+
+The mgAjax directive join always filter and model, although filter is only used in mgIndex options.
+
+Model is solved before data are sended to server via mgHttpFactory with the same factory.
+
+```
+acceptFactory.$inject = [];
+function acceptFactory() {
+	function accept(factory) {
+		var model = (factory.partialModel && this.mgEval(factory.partialModel)) || this.filter || this.model || {};
+		factory.service(factory.path, model);
+	}
+	return {
+		accept: accept
+	};
+}
+module.factory('mgAcceptFactory', acceptFactory);
+```
+
+When data are received from server they are allocated in the object model in the 'as' scope as this factory show.
+
+```
+createModelFactory.$inject = [];
+function createModelFactory() {
+	function assignModel(response) {
+		angular.extend(this.model, response.data || {});
+	}
+	return {
+		assignModel: assignModel
+	};
+ }
+module.factory('mgCreateModelFactory', createModelFactory);
+```
+
+
+With all it's commented before the 'as' scope for index option is like:
+
+```
+{
+	filter: {page:0,recorsPerPage:25} // applied filter
+	model:[...]
+	status:200 // after http service call
+	errorText : // only exists if an error has occurred when the http service is called
+	show:false // spinner is hidden
+	accept:function() // call to http service with the filter value
+	previousPage: function()  // page is decreased 1 and call to accept
+	mgEval:function() // it's binded to $scope to solve a global expression where ever we where
+	nextPage: function() // page is increased 1 and call to accept
+	params:{} // only available in case of the path use parameters
+}
+```
+
+Example of html
+
+```
+<mg-ajax data-path="/invoices" data-options="mgIndex">
+	<div class=’spinner’ ng-show=’index.show’/>
+	<div class=’error’’ ng-show=’index.errorText> 
+		{{index.errorText}}
+	</div>
+	<input type="text" ng-model="parent.filter.name" ng-change="parent.accept()" />
+	<div>
+		<button ng-click="index.accept()">Accept</button>
+		<button ng-click="index.nextPage()">Next</button>
+		<button ng-click="index.previousPage()" ng-disabled="index.filter.page==0">Previous</button>
+	</div>
+	<div>          
+		<ul>
+			<li ng-repeat="item in index.model">
+				{{item.id}}-{{item.name}}
+			</li>               
+		</ul>
+	</div>
+</mg-ajax>
+
+You can view a simple index without services neither controller. This allow you a declarative language thanks to magic angular.
