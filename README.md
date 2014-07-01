@@ -128,3 +128,29 @@ module.config(function (mgHttpProvider) {
         mgHttpProvider.setDefaultConfig({ url: 'http://localhost:48196' });
 });
 ```
+
+### init
+
+It has a similar behabiour to ngInit and allow us to update our scope (with predefined values) in the 'as' object.
+
+### method
+
+Supported methods are query, get, post, put, patch and delete. This field is required.
+
+### service
+
+It's a wrapper factory over $http where assign shorts methods to query (it's resolved with GET http verb) and patch. This value is required and you has to use 'mgHttpFactory' by default, although you can create your own service and replace it in override member or create your own factory. It's resolved using the $injector get method.
+
+### before
+
+Set of functions that are going to be executed before the REST invocation. This field is optional. Internally, it's a factory where all declared functionsare going to be executed in order.
+For example, before an http call may be you want to set a property to true in the 'as' scope to show a spinner, and hide it in the success and error method.
+
+```
+beforeHttpFactory.$inject = ['phSpinnerFactory'];
+function beforeHttpFactory(spinner) {
+        return {
+            show: spinner.show
+        };
+}
+```
