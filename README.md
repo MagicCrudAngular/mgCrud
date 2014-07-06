@@ -438,13 +438,13 @@ You can view a simple index without services neither controller. This allow you 
 
 mgCrud has dependencies with:
 * Angularjs
-* ngRoute
+* ngRoute(optional)
 
 ## How to use it
 
 ```
 <script scr=’angular.js’>
-<script src=’angular-route.js’’>
+<script src=’angular-route.js’’> (optional)
 <script src=’mgcrud.js’>
 ```
 
