@@ -1,7 +1,7 @@
 ﻿(function (module, undefined) {
 
-    controller.$inject = ['$scope', '$attrs', 'mgResolveFactory', '$routeParams'];
-    function controller(scope, attrs, mgFactory, params) {
+    controller.$inject = ['$scope', '$attrs', 'mgResolveFactory', '$routeParams', '$interpolate'];
+    function controller(scope, attrs, mgFactory, params,interpolate) {
         var factory = mgFactory(attrs.options, attrs.override, attrs.path),
             self = resolveSelf(),
             forEach = angular.forEach,
@@ -24,13 +24,15 @@
         function setPartialModel() {
             factory.partialModel = attrs.partialmodel;
         }
-        function createModel() {
+        function createModel() {           
             self.model = {};
         }
         function bindScopeEval() {
             self.mgEval = bind(scope, scope.$eval)
         }
-
+        function assingSelftToFactory() {
+            factory.self = self;
+        }
         function resolvePath() {
             if (factory.regexPath) {
                 var result = factory.regexPath.regexp.exec(attrs.path);
@@ -47,18 +49,7 @@
                 }
                 fn.call(self, factory, arguments);
             };
-        }
-
-        function bindFactories() {
-            forEach(['config', 'before', 'success', 'error', 'auto'], function (value) {
-                var fct = factory[value];
-                forEach(fct, function (fn, key) {
-                    if (isFunction(fn)) {
-                        fct[key] = bind(self, fn);
-                    }
-                })
-            });
-        }
+        }       
 
         function processCommand() {
             forEach(factory.cmd, function (fn, key) {
@@ -69,7 +60,8 @@
         }
 
         function processInitValues() {
-            factory.init && self.mgEval(factory.init);
+            var value=factory.init && interpolate(factory.init)(scope);
+            factory.init && self.mgEval(value);
         }
 
         function restoreCache() {
@@ -102,10 +94,11 @@
                 checkPath(fnauto);
             }
         }
+
+        assingSelftToFactory();
         createModel();
         setPartialModel();
-        bindScopeEval();
-        bindFactories();
+        bindScopeEval();       
         processCommand();
         processInitValues();
         processRouteParams();

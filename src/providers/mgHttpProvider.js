@@ -12,10 +12,10 @@
         function mgHttp(http) {
             var forEach = angular.forEach, service = {}, extend = angular.extend, isFunction = angular.isFunction;
             
-            function resolve(action, response) {
+            function resolve(action,self, response) {
                 forEach(action, function (value) {
                     if (isFunction(value)) {
-                        (response) ? value(response) : value();
+                        (response) ? value.call(self,response) : value.call(self);
                     }
                 });
             }
@@ -23,7 +23,7 @@
                 return (name === 'query') ? 'get' : name;
             }
             function resolveData(name, data) {
-                return (name === 'query') ? { params: data } : { data: data };
+                return (name === 'query' || name==='jsonp') ? { params: data } : { data: data };
             }
             function resolveUrl(config, path) {
                 var url = resolveConfig(config).url;
@@ -38,21 +38,21 @@
             function createResponse(data, status, headers, config,statusText) {
                 return { data: data, status: status, headers: headers, config: config,statusText:statusText };
             }
-            function runService(config, before, success, error) {
-                resolve(before);
+            function runService(config, before, success, error,self) {
+                resolve(before,self);
                 http(config).
                    success(function (data, status, headers, config,statusText) {
-                       resolve(success, createResponse(data, status, headers, config, statusText));
+                       resolve(success, self, createResponse(data, status, headers, config, statusText));
                    }).
                    error(function (data, status, headers, config, statusText) {
-                       resolve(error, createResponse(data, status, headers, config, statusText));
+                       resolve(error, self,createResponse(data, status, headers, config, statusText));
                    });
             }
             function createShortMethod() {
                 forEach(arguments, function (name) {
                     service[name] = function (config, before, sucess, error) {
-                        return function (path) {
-                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error);
+                        return function (path, self) {
+                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error, self);
                         };
                     };
                 });
@@ -60,14 +60,14 @@
             function createShortMethodWithData() {
                 forEach(arguments, function (name) {
                     service[name] = function (config, before, sucess, error) {
-                        return function (path, data) {
-                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error);
+                        return function (path, data, self) {
+                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error, self);
                         };
                     };
                 });
             }
             createShortMethod('get', 'delete');
-            createShortMethodWithData('post', 'put', 'query', 'patch');
+            createShortMethodWithData('post', 'put', 'query', 'patch','jsonp');
 
             return service;
         }

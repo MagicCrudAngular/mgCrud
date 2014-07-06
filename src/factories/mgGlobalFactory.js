@@ -51,7 +51,7 @@
     function acceptFactory() {
         function accept(factory) {
             var model = (factory.partialModel && this.mgEval(factory.partialModel)) || this.filter || this.model || {};
-            factory.service(factory.path, model);
+            factory.service(factory.path, model,factory.self);
         }
         return {
             accept: accept

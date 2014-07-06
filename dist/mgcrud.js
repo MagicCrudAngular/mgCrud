@@ -3,7 +3,7 @@
 (function (window,angular, undefined) {
     var module; magicCrudAngular = window.magicCrudAngular || (window.magicCrudAngular = {});
     if (!angular) return;
-    module=angular.module('mgCrud', ['ngRoute']);
+   
     magicCrudAngular.isEmpty = angular.isEmpty || (function (obj) {
         for (var p in obj) {
             if (obj.hasOwnProperty(p))  return false; 
@@ -11,12 +11,26 @@
         return true;
     });
     magicCrudAngular.version = { full: "1.0.0", major: 1, minor: 0, dot: 0, codeName: "magic-crud-angular" };
+
+   
+    (function resolveNgRoute() {
+        var module;
+        try {
+            angular.module('ngRoute');
+        }
+        catch (ex) {
+            module = angular.module('mgCrud', []);
+            module.constant('$routeParams', {});
+            return;
+        }
+        module = angular.module('mgCrud', ['ngRoute']);
+    })();
 }
 )(window,window.angular);
 (function (module, undefined) {
 
-    controller.$inject = ['$scope', '$attrs', 'mgResolveFactory', '$routeParams'];
-    function controller(scope, attrs, mgFactory, params) {
+    controller.$inject = ['$scope', '$attrs', 'mgResolveFactory', '$routeParams', '$interpolate'];
+    function controller(scope, attrs, mgFactory, params,interpolate) {
         var factory = mgFactory(attrs.options, attrs.override, attrs.path),
             self = resolveSelf(),
             forEach = angular.forEach,
@@ -39,13 +53,15 @@
         function setPartialModel() {
             factory.partialModel = attrs.partialmodel;
         }
-        function createModel() {
+        function createModel() {           
             self.model = {};
         }
         function bindScopeEval() {
             self.mgEval = bind(scope, scope.$eval)
         }
-
+        function assingSelftToFactory() {
+            factory.self = self;
+        }
         function resolvePath() {
             if (factory.regexPath) {
                 var result = factory.regexPath.regexp.exec(attrs.path);
@@ -62,18 +78,7 @@
                 }
                 fn.call(self, factory, arguments);
             };
-        }
-
-        function bindFactories() {
-            forEach(['config', 'before', 'success', 'error', 'auto'], function (value) {
-                var fct = factory[value];
-                forEach(fct, function (fn, key) {
-                    if (isFunction(fn)) {
-                        fct[key] = bind(self, fn);
-                    }
-                })
-            });
-        }
+        }       
 
         function processCommand() {
             forEach(factory.cmd, function (fn, key) {
@@ -84,7 +89,8 @@
         }
 
         function processInitValues() {
-            factory.init && self.mgEval(factory.init);
+            var value=factory.init && interpolate(factory.init)(scope);
+            factory.init && self.mgEval(value);
         }
 
         function restoreCache() {
@@ -117,10 +123,11 @@
                 checkPath(fnauto);
             }
         }
+
+        assingSelftToFactory();
         createModel();
         setPartialModel();
-        bindScopeEval();
-        bindFactories();
+        bindScopeEval();       
         processCommand();
         processInitValues();
         processRouteParams();
@@ -329,7 +336,7 @@
     function acceptFactory() {
         function accept(factory) {
             var model = (factory.partialModel && this.mgEval(factory.partialModel)) || this.filter || this.model || {};
-            factory.service(factory.path, model);
+            factory.service(factory.path, model,factory.self);
         }
         return {
             accept: accept
@@ -407,6 +414,7 @@
         return {
             as: 'index',
             init: 'index.filter={page:0,records:20}',
+            isArray:true,
             method: 'query',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
@@ -610,10 +618,10 @@
         function mgHttp(http) {
             var forEach = angular.forEach, service = {}, extend = angular.extend, isFunction = angular.isFunction;
             
-            function resolve(action, response) {
+            function resolve(action,self, response) {
                 forEach(action, function (value) {
                     if (isFunction(value)) {
-                        (response) ? value(response) : value();
+                        (response) ? value.call(self,response) : value.call(self);
                     }
                 });
             }
@@ -621,7 +629,7 @@
                 return (name === 'query') ? 'get' : name;
             }
             function resolveData(name, data) {
-                return (name === 'query') ? { params: data } : { data: data };
+                return (name === 'query' || name==='jsonp') ? { params: data } : { data: data };
             }
             function resolveUrl(config, path) {
                 var url = resolveConfig(config).url;
@@ -636,21 +644,21 @@
             function createResponse(data, status, headers, config,statusText) {
                 return { data: data, status: status, headers: headers, config: config,statusText:statusText };
             }
-            function runService(config, before, success, error) {
-                resolve(before);
+            function runService(config, before, success, error,self) {
+                resolve(before,self);
                 http(config).
                    success(function (data, status, headers, config,statusText) {
-                       resolve(success, createResponse(data, status, headers, config, statusText));
+                       resolve(success, self, createResponse(data, status, headers, config, statusText));
                    }).
                    error(function (data, status, headers, config, statusText) {
-                       resolve(error, createResponse(data, status, headers, config, statusText));
+                       resolve(error, self,createResponse(data, status, headers, config, statusText));
                    });
             }
             function createShortMethod() {
                 forEach(arguments, function (name) {
                     service[name] = function (config, before, sucess, error) {
-                        return function (path) {
-                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error);
+                        return function (path, self) {
+                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error, self);
                         };
                     };
                 });
@@ -658,14 +666,14 @@
             function createShortMethodWithData() {
                 forEach(arguments, function (name) {
                     service[name] = function (config, before, sucess, error) {
-                        return function (path, data) {
-                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error);
+                        return function (path, data, self) {
+                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error, self);
                         };
                     };
                 });
             }
             createShortMethod('get', 'delete');
-            createShortMethodWithData('post', 'put', 'query', 'patch');
+            createShortMethodWithData('post', 'put', 'query', 'patch','jsonp');
 
             return service;
         }

@@ -39,6 +39,7 @@
         return {
             as: 'index',
             init: 'index.filter={page:0,records:20}',
+            isArray:true,
             method: 'query',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
