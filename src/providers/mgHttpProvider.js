@@ -38,11 +38,15 @@
             function createResponse(data, status, headers, config,statusText) {
                 return { data: data, status: status, headers: headers, config: config,statusText:statusText };
             }
-            function runService(config, before, success, error,self) {
+            function runService(config, before, success, error,transform,self) {
                 resolve(before,self);
                 http(config).
-                   success(function (data, status, headers, config,statusText) {
-                       resolve(success, self, createResponse(data, status, headers, config, statusText));
+                   success(function (data, status, headers, config, statusText) {
+                       var newdata;
+                       if (transform) {
+                           newdata = transform.fn.call(self, data, transform.expression);
+                       }
+                       resolve(success, self, createResponse(newdata || data, status, headers, config, statusText));
                    }).
                    error(function (data, status, headers, config, statusText) {
                        resolve(error, self,createResponse(data, status, headers, config, statusText));
@@ -50,18 +54,18 @@
             }
             function createShortMethod() {
                 forEach(arguments, function (name) {
-                    service[name] = function (config, before, sucess, error) {
+                    service[name] = function (config, before, sucess, error,transform) {
                         return function (path, self) {
-                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error, self);
+                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error,transform, self);
                         };
                     };
                 });
             }
             function createShortMethodWithData() {
                 forEach(arguments, function (name) {
-                    service[name] = function (config, before, sucess, error) {
+                    service[name] = function (config, before, sucess, error,transform) {
                         return function (path, data, self) {
-                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error, self);
+                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error,transform, self);
                         };
                     };
                 });

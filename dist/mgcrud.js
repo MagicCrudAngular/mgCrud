@@ -31,7 +31,7 @@
 
     controller.$inject = ['$scope', '$attrs', 'mgResolveFactory', '$routeParams', '$interpolate'];
     function controller(scope, attrs, mgFactory, params,interpolate) {
-        var factory = mgFactory(attrs.options, attrs.override, attrs.path),
+        var factory = mgFactory(attrs.options, attrs.override, attrs.path, attrs.transform),
             self = resolveSelf(),
             forEach = angular.forEach,
             bind = angular.bind,
@@ -366,6 +366,22 @@
         };
     }
 
+    //default transform
+    function defaultTrasform() {
+        return function (data, expression) {
+            var isArray = angular.isArray, forEach = angular.forEach, newArray = [];
+            if (data && expression) {
+                if (isArray(data)) {
+                    forEach(data, function (value) {
+                        newArray.push(this.mgEval(expression, value));
+                    },this);
+                    return newArray;
+                }
+                return this.mgEval(expression, data);
+            }
+            return data;
+        }        
+    }
 
     module.factory('mgSpinnerFactory', spinnerFactory);
     module.factory('mgStatusFactory', statusFactory);
@@ -374,7 +390,7 @@
     module.factory('mgBeforeHttpFactory', beforeHttpFactory);
     module.factory('mgErrorHttpFactory', errorHttpFactory);
     module.factory('mgHistoryFactory', mgHistoryFactory);
-
+    module.factory('mgDefaultTransform', defaultTrasform);
     module.constant('accept', 'accept');
 
 })(angular.module('mgCrud'));
@@ -478,18 +494,27 @@
     mgResolveFactory.$inject = ['$injector', '$parse', 'mgResolvePathService', '$location'];
     function mgResolveFactory(injector, parse, resolvePath, location) {
 
-        function resolveFactory(factory, path) {
-            var forEach = angular.forEach, extend = angular.extend, newFactory = {};
-            //Services, factories, provides,constant
+        function resolveFactory(factory, path,transform) {
+            var forEach = angular.forEach, extend = angular.extend, newFactory = {}, DEFAULT_TRANSFORM = 'mgDefaultTransform';
+            //Services, factories, provides,values and constant
             forEach(['config', 'before', 'success', 'error', 'cmd', 'auto', 'service', 'cacheService'], function (value) {
                 newFactory[value] = factory[value] ? injector.get(factory[value]) : undefined;
             });
-            //values
+            //primitive values
             forEach(['method', 'as', 'auto', 'ajaxCmd', 'init','isArray'], function (key) {
                 if (factory.hasOwnProperty(key)) {
                     newFactory[key] = factory[key];
                 }
-            });           
+            });
+
+            if (transform) {
+                if (injector.has(transform)) {
+                    newFactory.transform = { fn: injector.get(transform) }
+                }
+                else {
+                    newFactory.transform = { fn: injector.get(DEFAULT_TRANSFORM), expression: transform }
+                }
+            }
 
             if (factory.cache) {
                 newFactory.cache = parse(factory.cache)();
@@ -497,16 +522,16 @@
             }
 
             if (newFactory.service && newFactory.method) {
-                newFactory.service = newFactory.service[newFactory.method](newFactory.config, newFactory.before, newFactory.success, newFactory.error);
+                newFactory.service = newFactory.service[newFactory.method](newFactory.config, newFactory.before, newFactory.success, newFactory.error, newFactory.transform);
             }
            
             return extend(newFactory, resolvePath.resolve(path));
         }
-        return function (options, override, path) {
+        return function (options, override, path,transform) {
             var factory = injector.has(options) ? injector.get(options) : parse(options)() || {};
             var override = parse(override)() || {};
 
-            return resolveFactory(angular.extend(factory, override), path);
+            return resolveFactory(angular.extend(factory, override), path, transform);
         };
     }
 
@@ -649,11 +674,15 @@
             function createResponse(data, status, headers, config,statusText) {
                 return { data: data, status: status, headers: headers, config: config,statusText:statusText };
             }
-            function runService(config, before, success, error,self) {
+            function runService(config, before, success, error,transform,self) {
                 resolve(before,self);
                 http(config).
-                   success(function (data, status, headers, config,statusText) {
-                       resolve(success, self, createResponse(data, status, headers, config, statusText));
+                   success(function (data, status, headers, config, statusText) {
+                       var newdata;
+                       if (transform) {
+                           newdata = transform.fn.call(self, data, transform.expression);
+                       }
+                       resolve(success, self, createResponse(newdata || data, status, headers, config, statusText));
                    }).
                    error(function (data, status, headers, config, statusText) {
                        resolve(error, self,createResponse(data, status, headers, config, statusText));
@@ -661,18 +690,18 @@
             }
             function createShortMethod() {
                 forEach(arguments, function (name) {
-                    service[name] = function (config, before, sucess, error) {
+                    service[name] = function (config, before, sucess, error,transform) {
                         return function (path, self) {
-                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error, self);
+                            runService(extend({ method: name, url: resolveUrl(config, path) }, resolveAdditionalConfig(config)), before, sucess, error,transform, self);
                         };
                     };
                 });
             }
             function createShortMethodWithData() {
                 forEach(arguments, function (name) {
-                    service[name] = function (config, before, sucess, error) {
+                    service[name] = function (config, before, sucess, error,transform) {
                         return function (path, data, self) {
-                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error, self);
+                            runService(extend(extend({ method: resolveMethod(name), url: resolveUrl(config, path) }, resolveData(name, data)), resolveAdditionalConfig(config)), before, sucess, error,transform, self);
                         };
                     };
                 });

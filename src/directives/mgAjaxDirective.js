@@ -2,7 +2,7 @@
 
     controller.$inject = ['$scope', '$attrs', 'mgResolveFactory', '$routeParams', '$interpolate'];
     function controller(scope, attrs, mgFactory, params,interpolate) {
-        var factory = mgFactory(attrs.options, attrs.override, attrs.path),
+        var factory = mgFactory(attrs.options, attrs.override, attrs.path, attrs.transform),
             self = resolveSelf(),
             forEach = angular.forEach,
             bind = angular.bind,

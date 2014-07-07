@@ -81,6 +81,22 @@
         };
     }
 
+    //default transform
+    function defaultTrasform() {
+        return function (data, expression) {
+            var isArray = angular.isArray, forEach = angular.forEach, newArray = [];
+            if (data && expression) {
+                if (isArray(data)) {
+                    forEach(data, function (value) {
+                        newArray.push(this.mgEval(expression, value));
+                    },this);
+                    return newArray;
+                }
+                return this.mgEval(expression, data);
+            }
+            return data;
+        }        
+    }
 
     module.factory('mgSpinnerFactory', spinnerFactory);
     module.factory('mgStatusFactory', statusFactory);
@@ -89,7 +105,7 @@
     module.factory('mgBeforeHttpFactory', beforeHttpFactory);
     module.factory('mgErrorHttpFactory', errorHttpFactory);
     module.factory('mgHistoryFactory', mgHistoryFactory);
-
+    module.factory('mgDefaultTransform', defaultTrasform);
     module.constant('accept', 'accept');
 
 })(angular.module('mgCrud'));
