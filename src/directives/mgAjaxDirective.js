@@ -25,7 +25,7 @@
             factory.partialModel = attrs.partialmodel;
         }
         function createModel() {           
-            self.model = {};
+            (factory.isArray)? self.model=[]: self.model = {};
         }
         function bindScopeEval() {
             self.mgEval = bind(scope, scope.$eval)

@@ -54,7 +54,7 @@
             factory.partialModel = attrs.partialmodel;
         }
         function createModel() {           
-            self.model = {};
+            (factory.isArray)? self.model=[]: self.model = {};
         }
         function bindScopeEval() {
             self.mgEval = bind(scope, scope.$eval)
@@ -323,9 +323,14 @@
 
     //Set response http(data) to model
     createModelFactory.$inject = [];
-    function createModelFactory() {
+    function createModelFactory() {        
         function assignModel(response) {
-            angular.extend(this.model, response.data || {});
+            if (angular.isArray(response.data) && angular.isArray(this.model)) {
+                this.model = response.data;
+            }
+            else {
+                angular.extend(this.model, response.data || {});
+            }            
         }
         return {
             assignModel: assignModel
@@ -479,8 +484,8 @@
             forEach(['config', 'before', 'success', 'error', 'cmd', 'auto', 'service', 'cacheService'], function (value) {
                 newFactory[value] = factory[value] ? injector.get(factory[value]) : undefined;
             });
-            //string
-            forEach(['method', 'as', 'auto', 'ajaxCmd', 'init'], function (key) {
+            //values
+            forEach(['method', 'as', 'auto', 'ajaxCmd', 'init','isArray'], function (key) {
                 if (factory.hasOwnProperty(key)) {
                     newFactory[key] = factory[key];
                 }

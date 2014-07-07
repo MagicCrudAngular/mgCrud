@@ -38,9 +38,14 @@
 
     //Set response http(data) to model
     createModelFactory.$inject = [];
-    function createModelFactory() {
+    function createModelFactory() {        
         function assignModel(response) {
-            angular.extend(this.model, response.data || {});
+            if (angular.isArray(response.data) && angular.isArray(this.model)) {
+                this.model = response.data;
+            }
+            else {
+                angular.extend(this.model, response.data || {});
+            }            
         }
         return {
             assignModel: assignModel

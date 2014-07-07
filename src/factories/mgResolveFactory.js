@@ -9,8 +9,8 @@
             forEach(['config', 'before', 'success', 'error', 'cmd', 'auto', 'service', 'cacheService'], function (value) {
                 newFactory[value] = factory[value] ? injector.get(factory[value]) : undefined;
             });
-            //string
-            forEach(['method', 'as', 'auto', 'ajaxCmd', 'init'], function (key) {
+            //values
+            forEach(['method', 'as', 'auto', 'ajaxCmd', 'init','isArray'], function (key) {
                 if (factory.hasOwnProperty(key)) {
                     newFactory[key] = factory[key];
                 }
