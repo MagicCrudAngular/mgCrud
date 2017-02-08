@@ -4,24 +4,34 @@
             for (var p in obj)if (obj.hasOwnProperty(p))return !1;
             return !0
         }, magicCrudAngular.version = {
-        full: "1.1.0",
+        full: "1.1.2",
         major: 1,
         minor: 0,
         dot: 0,
         codeName: "magic-crud-angular"
     }, function () {
         var module;
+        var deps = [];
+        var mokConstants = {};
+
         try {
-            angular.module("ngRoute")
+            angular.module("ngRoute");
+            deps.push("ngRoute");
         } catch (ex) {
-            return module = angular.module("mgCrud", []), void module.constant("$routeParams", {})
+            mokConstants["$routeParams"] = {};
         }
+
         try {
-            angular.module("ui.router")
+            angular.module("ui.router");
+            deps.push("ui.router");
         } catch (ex) {
-            return module = angular.module("mgCrud", []), void module.constant("$stateParams", {})
+            mokConstants["$stateParams"] = {};
         }
-        module = angular.module("mgCrud", ["ui.router", "ngRoute"])
+
+        module = angular.module("mgCrud", deps);
+        for(var key in mokConstants) {
+            module.constant(key, mokConstants[key]);
+        }
     }())
 }(window, window.angular);;(function (module, undefined) {
 
