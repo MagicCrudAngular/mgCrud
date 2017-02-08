@@ -1,4 +1,4 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
     //History
     mgHistoryFactory.$inject = ['$window']
@@ -38,25 +38,25 @@
 
     //Set response http(data) to model
     createModelFactory.$inject = [];
-    function createModelFactory() {        
+    function createModelFactory() {
         function assignModel(response) {
             if (angular.isArray(response.data) && angular.isArray(this.model)) {
                 this.model = response.data;
             }
             else {
                 angular.extend(this.model, response.data || {});
-            }            
+            }
         }
         return {
             assignModel: assignModel
         };
     }
-    //call service http 
+    //call service http
     acceptFactory.$inject = [];
     function acceptFactory() {
         function accept(factory) {
             var model = (factory.partialModel && this.mgEval(factory.partialModel)) || this.filter || this.model || {};
-            factory.service(factory.path, model,factory.self);
+            return factory.service(factory.path,factory.self,model);
         }
         return {
             accept: accept
@@ -95,7 +95,7 @@
                 return this.mgEval(expression, data);
             }
             return data;
-        }        
+        }
     }
 
     module.factory('mgSpinnerFactory', spinnerFactory);

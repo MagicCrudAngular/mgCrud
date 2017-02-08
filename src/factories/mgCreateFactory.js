@@ -1,10 +1,10 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
-  
+
 
     mgSuccessFactoryCreate.$inject = ['mgHistoryFactory', 'mgSpinnerFactory', 'mgStatusFactory', 'mgCreateModelFactory'];
     function mgSuccessFactoryCreate(history, spinner, status, createModel) {
-        
+
         return {
             hide: spinner.hide,
             status: status.setStatus,
@@ -31,7 +31,7 @@
             method: 'post',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
-            cache: '["model"]',
+            cache: '["{{as}}.model"]',
             before: 'mgBeforeHttpFactory',
             success: 'mgSuccessFactoryCreate',
             error: 'mgErrorHttpFactory',

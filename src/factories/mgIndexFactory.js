@@ -1,4 +1,4 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
 
     mgSuccessFactoryIndex.$inject = ['mgSpinnerFactory', 'mgStatusFactory', 'mgCreateModelFactory']
@@ -38,12 +38,12 @@
     module.factory('mgIndex', function () {
         return {
             as: 'index',
-            init: 'index.filter={page:0,records:20}',
+            init: '{{as}}.filter={page:1,size:20}',
             isArray:true,
             method: 'query',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
-            cache: '["filter"]',
+            cache: '["{{as}}.filter"]',
             before: 'mgBeforeHttpFactory',
             success: 'mgSuccessFactoryIndex',
             error: 'mgErrorHttpFactory',

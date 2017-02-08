@@ -1,17 +1,19 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
-    mgSucessFactoryDelete.$inject = ['$window', 'mgSpinnerFactory'];
-    function mgSucessFactoryDelete(window, spinner) {
+    mgSuccessFactoryDelete.$inject = ['mgHistoryFactory', 'mgSpinnerFactory'];
+    function mgSuccessFactoryDelete(history, spinner) {
         return {
             hide: spinner.hide,
+            back: history.back
+            /*
             back: function () {
-                window.history.back();
-            }
+                history.back();
+            }*/
         };
     }
 
 
-    module.factory('mgSucessFactoryDelete', mgSucessFactoryDelete)
+    module.factory('mgSuccessFactoryDelete', mgSuccessFactoryDelete)
 
     module.factory('mgDelete', function () {
         return {
@@ -19,7 +21,7 @@
             method: 'delete',
             service: 'mgHttp',
             before: 'mgBeforeHttpFactory',
-            success: 'mgSucessFactoryDelete',
+            success: 'mgSuccessFactoryDelete',
             error: 'mgErrorHttpFactory',
             cmd: 'mgCommandCreate',
             ajaxCmd: 'accept'

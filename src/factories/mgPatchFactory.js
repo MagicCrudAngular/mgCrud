@@ -1,7 +1,7 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
 
-    module.factory('mgPut', function () {
+    module.factory('mgPatch', function () {
         return {
             as: 'patch',
             init: 'patch.model=edit.model',

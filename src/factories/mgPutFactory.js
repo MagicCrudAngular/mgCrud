@@ -1,4 +1,4 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
 
     module.factory('mgPut', function () {

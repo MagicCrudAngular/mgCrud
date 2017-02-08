@@ -1,26 +1,14 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
 
-    mgSuccessFactoryEdit.$inject = ['mgSpinnerFactory', 'mgStatusFactory', 'mgCreateModelFactory']
-    function mgSuccessFactoryEdit(spinner, status, createModel) {
-        return {
-            hide: spinner.hide,
-            status: status.setStatus,
-            assingModel: createModel.assingModel
-        }
-
-    }
-
-    module.factory('mgSuccessFactoryEdit', mgSuccessFactoryEdit);
-
-
-    module.factory('mgEdit', function () {
+     module.factory('mgEdit', function () {
         return {
             as: 'edit',
             method: 'get',
             service: 'mgHttp',
             cacheService: 'mgCacheFactory',
-            cache: '["model"]',
+            cache: '["{{as}}.model"]',
+            cacheInvalidate:true,
             before: 'mgBeforeHttpFactory',
             success: 'mgSuccessFactoryIndex',
             error: 'mgErrorHttpFactory',

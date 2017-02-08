@@ -1,4 +1,4 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
     mgCacheFactory.$inject = ['$cacheFactory'];
     function mgCacheFactory(cacheFactory) {

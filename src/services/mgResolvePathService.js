@@ -1,4 +1,4 @@
-﻿(function (module, undefined) {
+(function (module, undefined) {
 
     resolvePath.$inject = ['$location'];
     function resolvePath(location) {

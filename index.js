@@ -1,2 +1,2 @@
-require('./dist/mgcrud');
+require('./dist/mgCrud');
 module.exports = magicCrudAngular;
